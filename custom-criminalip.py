@@ -65,7 +65,7 @@ except Exception as e:
 # New Alert Output for CriminalIP Alert or Error calling the API
 alert_output = {}
 # CriminalIP API AUTH KEY
-criminalip_api_key = "Your API KEY here"
+criminalip_api_key = api_key
 # API - HTTP Headers
 criminalip_apicall_headers = {
     "x-api-key": f"{criminalip_api_key}"
@@ -116,18 +116,18 @@ if any(group in ['web', 'sshd', 'invalid_login'] for group in event_source):
                         score = criminalip_api_response["score"]
                         issues = criminalip_api_response["issues"]
                         alert_output["criminalip"] = {
-                        "ip": criminalip_api_response["ip"],
-                        "score_inbound": score.get("inbound", "Unknown"),
-                        "score_outbound": score.get("outbound", "Unknown"),
-                        "is_vpn": issues.get("is_vpn", False),
-                        "is_tor": issues.get("is_tor", False),
-                        "is_proxy": issues.get("is_proxy", False),
-                        "is_cloud": issues.get("is_cloud", False),
-                        "is_hosting": issues.get("is_hosting", False),
-                        "is_darkweb": issues.get("is_darkweb", False),
-                        "is_scanner": issues.get("is_scanner", False),
-                        "is_snort": issues.get("is_snort", False),
-                        "is_anonymous_vpn": issues.get("is_anonymous_vpn", False)
+                            "ip": criminalip_api_response["ip"],
+                            "score_inbound": score.get("inbound", "Unknown"),
+                            "score_outbound": score.get("outbound", "Unknown"),
+                            "is_vpn": issues.get("is_vpn", False),
+                            "is_tor": issues.get("is_tor", False),
+                            "is_proxy": issues.get("is_proxy", False),
+                            "is_cloud": issues.get("is_cloud", False),
+                            "is_hosting": issues.get("is_hosting", False),
+                            "is_darkweb": issues.get("is_darkweb", False),
+                            "is_scanner": issues.get("is_scanner", False),
+                            "is_snort": issues.get("is_snort", False),
+                            "is_anonymous_vpn": issues.get("is_anonymous_vpn", False)
                         }
                         alert_output["integration"] = "criminalip"
                         logging.debug(f"Alert Output: {alert_output}")
