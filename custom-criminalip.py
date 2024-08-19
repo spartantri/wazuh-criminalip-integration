@@ -74,7 +74,7 @@ except KeyError as e:
     logging.debug(f"Missing expected key in alert: {e}")
     sys.exit(1)
 
-if event_source == 'web':
+if event_source in ['web', 'sshd', 'invalid_login']:
     try:
         client_ip = alert["data"]["srcip"] # Extract client IP
         logging.debug(f"Extracted Client IP: {client_ip}")
