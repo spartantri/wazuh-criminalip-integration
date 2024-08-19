@@ -1,5 +1,6 @@
 #!/usr/bin/env python
-#Original script by Shahid Akhter / Shahidahktar@gmail.com
+# Original script by Shahid Akhter / Shahidahktar@gmail.com
+# Updated by Manuel Spartan
 import sys
 import os
 import json
@@ -11,7 +12,7 @@ from socket import socket, AF_UNIX, SOCK_DGRAM
 import time
 # Enable or disable debugging
 debug_enabled = True  # Set to False to disable debug logging
-log_level=logging.DEBUG  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
+log_level=logging.INFO  # Set the logging level (DEBUG, INFO, WARNING, ERROR, CRITICAL)
 # File and socket paths
 pwd = os.path.dirname(os.path.dirname(os.path.realpath(__file__)))
 socket_addr = f'{pwd}/queue/sockets/queue'
@@ -54,13 +55,13 @@ try:
     api_key = sys.argv[2] if len(sys.argv) > 1 else ""
     alert = json.loads(alert_file.read())
     alert_file.close()
-    logging.debug("Alert loaded successfully")
+    logging.info("Alert loaded successfully")
     logging.debug(alert)
     if api_key == "":
         logging.debug(f"Error reading api_key, configure ossec.conf")
         sys.exit(1)
 except Exception as e:
-    logging.debug(f"Error reading alert file: {e}")
+    logging.error(f"Error reading alert file: {e}")
     sys.exit(1)
 # New Alert Output for CriminalIP Alert or Error calling the API
 alert_output = {}
@@ -76,13 +77,13 @@ try:
     event_source = alert["rule"]["groups"]
     logging.debug(f"Event source: {event_source}")
 except KeyError as e:
-    logging.debug(f"Missing expected key in alert: {e}")
+    logging.error(f"Missing expected key in alert: {e}")
     sys.exit(1)
 
 if any(group in ['web', 'sshd', 'invalid_login'] for group in event_source):
     try:
         client_ip = alert["data"]["srcip"] # Extract client IP
-        logging.debug(f"Extracted Client IP: {client_ip}")
+        logging.info(f"Extracted Client IP: {client_ip}")
         if ipaddress.ip_address(client_ip).is_global:
             # Pass the client_ip value directly into the URL
             criminalip_search_url = f'https://api.criminalip.io/v1/asset/ip/report?ip={client_ip}&full=true'
@@ -90,7 +91,7 @@ if any(group in ['web', 'sshd', 'invalid_login'] for group in event_source):
             try:
                 criminalip_api_response = requests.get(criminalip_search_url, headers=criminalip_apicall_headers)
                 criminalip_api_response.raise_for_status() # Raise HTTPError for bad responses
-                logging.debug("API request successful")
+                logging.info("API request successful")
             except ConnectionError as conn_err:
                 alert_output["criminalip"] = {"error": 'Connection Error to CriminalIP API'}
                 alert_output["integration"] = "criminalip"
@@ -135,7 +136,7 @@ if any(group in ['web', 'sshd', 'invalid_login'] for group in event_source):
                     else:
                         alert_output["criminalip"] = {"error": 'No score information found in CriminalIP response'}
                         alert_output["integration"] = "criminalip"
-                        logging.debug("No score information found in CriminalIP response")
+                        logging.info("No score information found in CriminalIP response")
                         send_event(alert_output, alert.get("agent"))
                 except Exception as e:
                     alert_output["criminalip"] = {"error": f"Error parsing JSON response: {e}"}
