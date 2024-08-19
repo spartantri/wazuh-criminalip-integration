@@ -54,6 +54,7 @@ try:
     alert = json.loads(alert_file.read())
     alert_file.close()
     logging.debug("Alert loaded successfully")
+    logging.debug(alert)
 except Exception as e:
     logging.debug(f"Error reading alert file: {e}")
     sys.exit(1)
@@ -148,5 +149,4 @@ if any(group in ['web', 'sshd', 'invalid_login'] for group in event_source):
         sys.exit()
 else:
     logging.error(f"Event source is not desired: {event_source}")
-    logging.debug()
     sys.exit()
